@@ -1,15 +1,16 @@
-import logo from './logo.svg';
-import './App.css';
-import ChatverseApp from "./pages/chatverse";
-import { store } from './store/store';
-import {Provider} from "react-redux";
+import './App.css'
+import { store } from './store/store'
+import { Provider } from 'react-redux'
+import Navbar from './pages/common/navbar'
+import Dashboard from './pages/dashboard'
 
 const App = () => {
-  return (
-    <Provider store={store}>
-      <ChatverseApp />
-    </Provider>
-  );
-};
+    return (
+        <Provider store={store}>
+            <Navbar />
+            <Dashboard />
+        </Provider>
+    )
+}
 
-export default App;
+export default App
