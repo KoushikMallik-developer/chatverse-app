@@ -1,0 +1,380 @@
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { Bell, User, Settings, Mic, Phone, Reply, Smile, Share2, X, Search, Plus, MessageCircle } from 'lucide-react';
+import {
+  sendMessage,
+  addReaction,
+  addReply,
+  setActiveChat,
+  addNotification
+} from '../store/slices/chatSlice';
+import HuddleControls from "../components/HuddleControls";
+import DrawingCanvas from "../components/DrawingCanvas";
+import EmojiPicker from "../components/EmojiPicker";
+
+const ChatverseApp = () => {
+  const dispatch = useDispatch();
+  const {
+    messages,
+    channels,
+    users,
+    activeChat,
+    notifications,
+    huddleState
+  } = useSelector(state => state.chat);
+
+  const [messageInput, setMessageInput] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [showUserProfile, setShowUserProfile] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  // Handle new messages
+  useEffect(() => {
+    const handleNewMessage = (message) => {
+      dispatch(sendMessage(message));
+      dispatch(addNotification({
+        id: Date.now(),
+        title: `New message from ${message.user}`,
+        content: message.content
+      }));
+    };
+
+    // Mock WebSocket connection
+    const mockWebSocket = {
+      onmessage: (event) => handleNewMessage(event.data)
+    };
+
+    return () => {
+      // Cleanup WebSocket
+    };
+  }, [dispatch]);
+
+  const handleSendMessage = () => {
+    if (!messageInput.trim()) return;
+
+    const newMessage = {
+      id: Date.now(),
+      user: 'Current User',
+      content: messageInput,
+      timestamp: new Date().toLocaleTimeString(),
+      reactions: [],
+      replies: [],
+      replyTo: replyingTo
+    };
+
+    dispatch(sendMessage(newMessage));
+    setMessageInput('');
+    setReplyingTo(null);
+  };
+
+  const UserProfile = ({ user }) => (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+      <div className="bg-white rounded-lg p-6 w-96">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">User Profile</h2>
+          <X
+            className="cursor-pointer"
+            onClick={() => setShowUserProfile(false)}
+          />
+        </div>
+        <div className="space-y-4">
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center text-white text-2xl">
+              {user.avatar}
+            </div>
+            <div>
+              <h3 className="font-bold">{user.name}</h3>
+              <p className="text-gray-500">{user.role}</p>
+            </div>
+          </div>
+          <div>
+            <p className="text-gray-600">Email: {user.email}</p>
+            <p className="text-gray-600">Status: {user.status}</p>
+          </div>
+          <button
+            className="w-full bg-blue-500 text-white rounded py-2"
+            onClick={() => {
+              setActiveChat({ type: 'dm', id: user.id });
+              setShowUserProfile(false);
+            }}
+          >
+            Send Message
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="h-screen flex flex-col">
+      {/* Navbar */}
+      <nav className="bg-[#350d36] text-white p-4 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <h1 className="text-xl font-bold">Chatverse</h1>
+          <div className="relative">
+            <Search className="absolute left-2 top-2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search Chatverse"
+              className="bg-[#431e44] pl-8 pr-4 py-1 rounded text-sm focus:outline-none"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <Bell
+              className="w-6 h-6 cursor-pointer"
+              onClick={() => dispatch({ type: 'CLEAR_NOTIFICATIONS' })}
+            />
+            {notifications.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 rounded-full w-4 h-4 text-xs flex items-center justify-center">
+                {notifications.length}
+              </span>
+            )}
+          </div>
+          <User
+            className="w-6 h-6 cursor-pointer"
+            onClick={() => {
+              setSelectedUser(users.find(u => u.id === 1)); // Current user
+              setShowUserProfile(true);
+            }}
+          />
+          <Settings className="w-6 h-6 cursor-pointer" />
+        </div>
+      </nav>
+
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar */}
+        <div className="w-60 bg-[#3f0e40] text-white p-4">
+          {/* Channels */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="font-semibold">Channels</h2>
+              <Plus className="w-4 h-4 cursor-pointer" />
+            </div>
+            {channels.map(channel => (
+              <div
+                key={channel.id}
+                className={`flex items-center justify-between p-2 cursor-pointer rounded ${
+                  activeChat.type === 'channel' && activeChat.id === channel.id 
+                    ? 'bg-[#1164A3]' 
+                    : 'hover:bg-[#350d36]'
+                }`}
+                onClick={() => dispatch(setActiveChat({ type: 'channel', id: channel.id }))}
+              >
+                <span># {channel.name}</span>
+                {channel.unread > 0 && (
+                  <span className="bg-red-500 rounded-full px-2 py-1 text-xs">
+                    {channel.unread}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Direct Messages */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="font-semibold">Direct Messages</h2>
+              <Plus className="w-4 h-4 cursor-pointer" />
+            </div>
+            {users.map(user => (
+              <div
+                key={user.id}
+                className={`flex items-center gap-2 p-2 cursor-pointer rounded ${
+                  activeChat.type === 'dm' && activeChat.id === user.id 
+                    ? 'bg-[#1164A3]' 
+                    : 'hover:bg-[#350d36]'
+                }`}
+                onClick={() => {
+                  setSelectedUser(user);
+                  setShowUserProfile(true);
+                }}
+              >
+                <div className={`w-2 h-2 rounded-full ${
+                  user.status === 'online' ? 'bg-green-500' : 'bg-gray-500'
+                }`} />
+                <span>{user.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Main Chat Area */}
+        <div className="flex-1 flex flex-col bg-white">
+          {/* Chat Header */}
+          <div className="border-b p-4 flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              {activeChat.type === 'channel' ? (
+                <span className="font-semibold">
+                  # {channels.find(c => c.id === activeChat.id)?.name}
+                </span>
+              ) : (
+                <span className="font-semibold">
+                  {users.find(u => u.id === activeChat.id)?.name}
+                </span>
+              )}
+            </div>
+
+            <HuddleControls />
+          </div>
+
+          {/* Messages */}
+          <div className="flex-1 overflow-y-auto p-4">
+            {messages
+              .filter(msg => {
+                if (activeChat.type === 'channel') return !msg.isDirect;
+                return msg.isDirect && (msg.to === activeChat.id || msg.from === activeChat.id);
+              })
+              .map(message => (
+                <div key={message.id} className="mb-4 hover:bg-gray-50 p-2 rounded">
+                  <div className="flex items-start gap-2">
+                    <div
+                      className="w-8 h-8 bg-[#1164A3] text-white rounded-full flex items-center justify-center cursor-pointer"
+                      onClick={() => {
+                        setSelectedUser(users.find(u => u.name === message.user));
+                        setShowUserProfile(true);
+                      }}
+                    >
+                      {message.user[0]}
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold">{message.user}</span>
+                        <span className="text-sm text-gray-500">{message.timestamp}</span>
+                      </div>
+
+                      {message.replyTo && (
+                        <div className="ml-4 mt-1 border-l-2 border-gray-300 pl-2 text-sm text-gray-500">
+                          Replying to {messages.find(m => m.id === message.replyTo)?.user}
+                        </div>
+                      )}
+
+                      <p className="mt-1">{message.content}</p>
+
+                      {/* Reactions */}
+                      <div className="flex gap-2 mt-2">
+                        {message.reactions?.map((reaction, i) => (
+                          <div
+                            key={i}
+                            className="bg-gray-100 px-2 py-1 rounded-full text-sm flex items-center gap-1 cursor-pointer hover:bg-gray-200"
+                            onClick={() => dispatch(addReaction({
+                              messageId: message.id,
+                              reaction
+                            }))}
+                          >
+                            <span>{reaction}</span>
+                          </div>
+                        ))}
+                        <div className="relative">
+                          <Smile
+                            className="w-4 h-4 text-gray-500 cursor-pointer"
+                            onClick={() => setShowEmojiPicker(message.id)}
+                          />
+                          {showEmojiPicker === message.id && (
+                            <EmojiPicker
+                              messageId={message.id}
+                              onClose={() => setShowEmojiPicker(false)}
+                            />
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Reply button */}
+                      <button
+                        className="text-gray-500 hover:text-gray-700 mt-2 flex items-center gap-1"
+                        onClick={() => setReplyingTo(message.id)}
+                      >
+                        <Reply className="w-4 h-4" />
+                        Reply
+                      </button>
+
+                      {/* Replies */}
+                      {message.replies?.length > 0 && (
+                        <div className="ml-4 mt-2 space-y-2">
+                          {message.replies.map(reply => (
+                            <div key={reply.id} className="flex items-start gap-2">
+                              <div className="w-6 h-6 bg-[#1164A3] text-white rounded-full flex items-center justify-center text-sm">
+                                {reply.user[0]}
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold text-sm">{reply.user}</span>
+                                  <span className="text-xs text-gray-500">{reply.timestamp}</span>
+                                </div>
+                                <p className="text-sm">{reply.content}</p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+
+          {/* Message Input */}
+          <div className="p-4 border-t">
+            {replyingTo && (
+              <div className="mb-2 text-sm text-gray-500 flex items-center gap-2">
+                <Reply className="w-4 h-4" />
+                Replying to {messages.find(m => m.id === replyingTo)?.user}
+                <button
+                  className="text-gray-700 hover:text-gray-900"
+                  onClick={() => setReplyingTo(null)}
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={messageInput}
+                onChange={(e) => setMessageInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                placeholder={`Message ${
+                  activeChat.type === 'channel' 
+                    ? '#' + channels.find(c => c.id === activeChat.id)?.name 
+                    : users.find(u => u.id === activeChat.id)?.name
+                }`}
+                className="flex-1 p-2 border rounded-md focus:outline-none focus:border-[#1164A3]"
+              />
+              <button
+                onClick={handleSendMessage}
+                className="bg-[#1164A3] text-white px-4 py-2 rounded-md hover:bg-[#0f5a9e]"
+              >
+                Send
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Huddle Drawing Area */}
+        {huddleState.isActive && huddleState.isDrawing && (
+          <div className="fixed bottom-4 right-4 bg-white rounded-lg shadow-lg p-4">
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="font-semibold">Drawing Canvas</h3>
+              <X
+                className="cursor-pointer"
+                onClick={() => dispatch({ type: 'TOGGLE_DRAWING' })}
+              />
+            </div>
+            <DrawingCanvas />
+          </div>
+        )}
+      </div>
+
+      {/* User Profile Modal */}
+      {showUserProfile && selectedUser && (
+        <UserProfile user={selectedUser} />
+      )}
+    </div>
+  );
+}
