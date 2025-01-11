@@ -16,11 +16,6 @@ const Login = () => {
     const handleLoginuser = () => {
         dispatch(loginUser({ email, password }))
     }
-    useEffect(() => {
-        if (status_code && status_code === 200) {
-            navigate('/workspaces')
-        }
-    }, [status_code])
 
     useEffect(() => {
         if (isLoggedIn) {

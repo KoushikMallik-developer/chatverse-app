@@ -27,6 +27,19 @@ export const registerUser = createAsyncThunk(
     }
 )
 
+// Async thunk for getting user details
+export const getUserDetails = createAsyncThunk(
+    'auth/getUserDetails',
+    async (token, { rejectWithValue }) => {
+        try {
+            const response = await authService.getUserDetails(token)
+            return response
+        } catch (error) {
+            return rejectWithValue(error.message)
+        }
+    }
+)
+
 const authSlice = createSlice({
     name: 'auth',
     initialState: {
@@ -92,6 +105,18 @@ const authSlice = createSlice({
                 state.status_code = action.payload.status_code
             })
             .addCase(registerUser.rejected, (state, action) => {
+                state.isLoading = false
+                state.message = action.payload
+            })
+            .addCase(getUserDetails.pending, (state) => {
+                state.isLoading = true
+                state.message = null
+            })
+            .addCase(getUserDetails.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.user = action.payload
+            })
+            .addCase(getUserDetails.rejected, (state, action) => {
                 state.isLoading = false
                 state.message = action.payload
             })

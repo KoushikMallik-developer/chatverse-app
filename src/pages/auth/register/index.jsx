@@ -52,7 +52,7 @@ const Register = () => {
                     <p className="mt-2 text-gray-600">Join ChatVerse today</p>
                 </div>
 
-                {status_code && status_code === 201 && (
+                {status_code && status_code === 201 && message && (
                     <div
                         className="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400"
                         role="alert"
@@ -60,7 +60,7 @@ const Register = () => {
                         {message}
                     </div>
                 )}
-                {status_code && status_code !== 201 && (
+                {status_code && status_code !== 201 && message && (
                     <div
                         className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
                         role="alert"
