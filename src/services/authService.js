@@ -3,6 +3,16 @@ import { handleErrors } from '../utils/error_handler'
 
 const API_URL = 'http://127.0.0.1:8000'
 
+// OLD CODE
+// OLD CODE
+// OLD CODE
+// OLD CODE
+// OLD CODE
+// OLD CODE
+// OLD CODE
+// OLD CODE
+// OLD CODE
+
 const register = async (userData) => {
     userData = {
         name: userData['name'],

@@ -5,6 +5,7 @@ import {
     registerUser,
     setMessageAndStatusCode,
 } from '../../../store/slices/authSlice'
+import toast from 'react-hot-toast'
 const Register = () => {
     const { isLoading, message, status_code, isLoggedIn } = useSelector(
         (state) => state.auth
@@ -37,10 +38,15 @@ const Register = () => {
     }
 
     useEffect(() => {
+        if (status_code === 201) {
+            toast.success(message)
+            navigate('/login')
+        }
+
         if (isLoggedIn) {
             navigate('/workspaces')
         }
-    }, [isLoggedIn])
+    }, [isLoggedIn, status_code])
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -51,24 +57,6 @@ const Register = () => {
                     </h2>
                     <p className="mt-2 text-gray-600">Join ChatVerse today</p>
                 </div>
-
-                {status_code && status_code === 201 && message && (
-                    <div
-                        className="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400"
-                        role="alert"
-                    >
-                        {message}
-                    </div>
-                )}
-                {status_code && status_code !== 201 && message && (
-                    <div
-                        className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
-                        role="alert"
-                    >
-                        {message}
-                    </div>
-                )}
-
                 <form className="mt-8 space-y-6">
                     <div className="space-y-4">
                         <div>

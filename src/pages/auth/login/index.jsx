@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
-import { loginUser, registerUser } from '../../../store/slices/authSlice'
+import { loginUser } from '../../../store/slices/authSlice'
+import toast from 'react-hot-toast'
 const Login = () => {
-    const { isLoading, message, status_code, isLoggedIn } = useSelector(
+    const { isLoading, message, status_code, isLoggedIn, token } = useSelector(
         (state) => state.auth
     )
     const dispatch = useDispatch()
@@ -18,11 +19,13 @@ const Login = () => {
     }
 
     useEffect(() => {
+        if (status_code === 200 && isLoggedIn && token) {
+            toast.success(message || 'Logged in successfully')
+        }
         if (isLoggedIn) {
             navigate('/workspaces')
         }
-    }, [isLoggedIn])
-
+    }, [isLoggedIn, status_code, message, navigate, token])
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
             <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow">
@@ -32,14 +35,6 @@ const Login = () => {
                     </h2>
                     <p className="mt-2 text-gray-600">Sign in to ChatVerse</p>
                 </div>
-                {status_code && status_code !== 200 && (
-                    <div
-                        className="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400"
-                        role="alert"
-                    >
-                        {message}
-                    </div>
-                )}
                 <form className="mt-8 space-y-6">
                     <div className="space-y-4">
                         <div>

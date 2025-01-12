@@ -12,9 +12,7 @@ import { useNavigate } from 'react-router-dom'
 import { setActiveWorkspace } from '../../store/slices/channelSlice'
 
 const WorkspaceList = () => {
-    const { user, isLoading, isLoggedIn, token } = useSelector(
-        (state) => state.auth
-    )
+    const { token } = useSelector((state) => state.auth)
     const { workspaces, message } = useSelector((state) => state.workspace)
     const dispatch = useDispatch()
 
@@ -53,7 +51,7 @@ const WorkspaceList = () => {
     useEffect(() => {
         dispatch(getUserDetails(token))
         dispatch(fetchWorkspaces(token))
-    }, [token])
+    }, [token, dispatch])
 
     const handleCreateWorkspace = () => {
         dispatch(
