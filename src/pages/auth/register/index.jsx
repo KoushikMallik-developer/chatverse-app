@@ -39,10 +39,8 @@ const Register = () => {
 
     useEffect(() => {
         if (status_code === 201) {
-            toast.success(message)
             navigate('/login')
         }
-
         if (isLoggedIn) {
             navigate('/workspaces')
         }

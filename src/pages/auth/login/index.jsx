@@ -19,9 +19,6 @@ const Login = () => {
     }
 
     useEffect(() => {
-        if (status_code === 200 && isLoggedIn && token) {
-            toast.success(message || 'Logged in successfully')
-        }
         if (isLoggedIn) {
             navigate('/workspaces')
         }

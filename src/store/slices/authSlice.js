@@ -139,6 +139,7 @@ const authSlice = createSlice({
                 if (action.payload.token) {
                     localStorage.setItem('access_token', action.payload.token)
                 }
+                toast.success(state.message || 'Logged in successfully')
             })
             .addCase(loginUser.rejected, (state, action) => {
                 state.isLoading = false
@@ -155,6 +156,10 @@ const authSlice = createSlice({
                 state.isLoading = false
                 state.message = action.payload.message
                 state.status_code = action.payload.status_code
+                toast.success(
+                    state.message ||
+                        'User registration successful. Please login.'
+                )
             })
             .addCase(registerUser.rejected, (state, action) => {
                 state.isLoading = false

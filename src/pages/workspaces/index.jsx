@@ -10,10 +10,13 @@ import {
 } from '../../store/slices/workspaceSlice'
 import { useNavigate } from 'react-router-dom'
 import { setActiveWorkspace } from '../../store/slices/channelSlice'
+import toast from 'react-hot-toast'
 
 const WorkspaceList = () => {
     const { token } = useSelector((state) => state.auth)
-    const { workspaces, message } = useSelector((state) => state.workspace)
+    const { workspaces, message, status_code } = useSelector(
+        (state) => state.workspace
+    )
     const dispatch = useDispatch()
 
     const [name, setName] = useState('')
@@ -40,7 +43,6 @@ const WorkspaceList = () => {
                     name: editName,
                     description: editDescription,
                 },
-                token,
             })
         )
         setEditWorkspaceId(null)
@@ -54,9 +56,7 @@ const WorkspaceList = () => {
     }, [token, dispatch])
 
     const handleCreateWorkspace = () => {
-        dispatch(
-            createWorkspace({ workspaceData: { name, description }, token })
-        )
+        dispatch(createWorkspace({ workspaceData: { name, description } }))
         setShowForm(false)
         setName('')
         setDescription('')
@@ -146,7 +146,6 @@ const WorkspaceList = () => {
                                                       removeWorkspace({
                                                           workspaceId:
                                                               workspace._id,
-                                                          token: token,
                                                       })
                                                   )
                                               }

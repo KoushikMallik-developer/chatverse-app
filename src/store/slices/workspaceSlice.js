@@ -1,30 +1,50 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import workspaceService from '../../services/workspaceService'
+import Axios from '../../utils/axios'
+import SummaryApi from '../../utils/summary_api'
+import { AxiosToastError } from '../../utils/axios_toast_error_handler'
+import toast from 'react-hot-toast'
 
 // Async thunk for getting workspaces
 export const fetchWorkspaces = createAsyncThunk(
     'workspace/fetchWorkspaces',
-    async (token, { rejectWithValue }) => {
+    async (userData, thunkAPI) => {
         try {
-            const response = await workspaceService.getWorkspaces(token)
-            return response
+            const response = await Axios({
+                ...SummaryApi.getWorkspaces,
+            })
+            return {
+                message: 'Workspaces fetched successfully',
+                workspaces: response.data,
+                status_code: response.status,
+            }
         } catch (error) {
-            return rejectWithValue(error.message)
+            const errorPayload = AxiosToastError(error)
+            return thunkAPI.rejectWithValue({
+                message: errorPayload.message,
+                status_code: error.status,
+            })
         }
     }
 )
 // Async thunk for removing a workspace
 export const removeWorkspace = createAsyncThunk(
     'workspace/removeWorkspace',
-    async ({ workspaceId, token }, { rejectWithValue }) => {
+    async ({ workspaceId }, thunkAPI) => {
         try {
-            const response = await workspaceService.removeWorkspace(
-                workspaceId,
-                token
-            )
-            return response
+            const response = await Axios({
+                ...SummaryApi.deleteWorkspace(workspaceId),
+            })
+            return {
+                message: response.data.message,
+                status_code: response.status,
+            }
         } catch (error) {
-            return rejectWithValue(error.message)
+            const errorPayload = AxiosToastError(error)
+            return thunkAPI.rejectWithValue({
+                message: errorPayload.message,
+                status_code: error.status,
+            })
         }
     }
 )
@@ -32,15 +52,27 @@ export const removeWorkspace = createAsyncThunk(
 // Async thunk for updating a workspace
 export const updateWorkspace = createAsyncThunk(
     'workspace/updateWorkspace',
-    async ({ workspaceData, token }, { rejectWithValue }) => {
+    async ({ workspaceData }, thunkAPI) => {
         try {
-            const response = await workspaceService.updateWorkspace(
-                workspaceData,
-                token
-            )
-            return response
+            const payload = {
+                name: workspaceData['name'],
+                description: workspaceData['description'],
+            }
+            const response = await Axios({
+                ...SummaryApi.updateWorkspace(workspaceData['id']),
+                data: payload,
+            })
+            return {
+                workspace: response.data.workspace,
+                message: response.data.message,
+                status_code: response.status,
+            }
         } catch (error) {
-            return rejectWithValue(error.message)
+            const errorPayload = AxiosToastError(error)
+            return thunkAPI.rejectWithValue({
+                message: errorPayload.message,
+                status_code: error.status,
+            })
         }
     }
 )
@@ -48,15 +80,27 @@ export const updateWorkspace = createAsyncThunk(
 // Async thunk for creating a new workspace
 export const createWorkspace = createAsyncThunk(
     'workspace/createWorkspace',
-    async ({ workspaceData, token }, { rejectWithValue }) => {
+    async ({ workspaceData }, thunkAPI) => {
         try {
-            const response = await workspaceService.createWorkspace(
-                workspaceData,
-                token
-            )
-            return response
+            const payload = {
+                name: workspaceData['name'],
+                description: workspaceData['description'],
+            }
+            const response = await Axios({
+                ...SummaryApi.createWorkspace,
+                data: payload,
+            })
+            return {
+                workspace: response.data.workspace,
+                message: response.data.message,
+                status_code: response.status,
+            }
         } catch (error) {
-            return rejectWithValue(error.message)
+            const errorPayload = AxiosToastError(error)
+            return thunkAPI.rejectWithValue({
+                message: errorPayload.message,
+                status_code: error.status,
+            })
         }
     }
 )
@@ -98,6 +142,7 @@ const workspaceSlice = createSlice({
         workspaces: [],
         isLoading: false,
         message: null,
+        status_code: null,
     },
     reducers: {},
     extraReducers: (builder) => {
@@ -108,11 +153,15 @@ const workspaceSlice = createSlice({
             })
             .addCase(fetchWorkspaces.fulfilled, (state, action) => {
                 state.isLoading = false
-                state.workspaces = action.payload
+                state.workspaces = action.payload.workspaces
+                state.message = action.payload.message
+                state.status_code = action.payload.status_code
+                toast.success(state.message)
             })
             .addCase(fetchWorkspaces.rejected, (state, action) => {
                 state.isLoading = false
-                state.message = action.payload
+                state.message = action.payload.message
+                state.status_code = action.payload.status_code
             })
             .addCase(createWorkspace.pending, (state) => {
                 state.isLoading = true
@@ -121,10 +170,14 @@ const workspaceSlice = createSlice({
             .addCase(createWorkspace.fulfilled, (state, action) => {
                 state.isLoading = false
                 state.workspaces.push(action.payload.workspace)
+                state.message = action.payload.message
+                state.status_code = action.payload.status_code
+                toast.success(state.message)
             })
             .addCase(createWorkspace.rejected, (state, action) => {
                 state.isLoading = false
-                state.message = action.payload
+                state.message = action.payload.message
+                state.status_code = action.payload.status_code
             })
             .addCase(removeWorkspace.pending, (state) => {
                 state.isLoading = true
@@ -132,13 +185,17 @@ const workspaceSlice = createSlice({
             })
             .addCase(removeWorkspace.fulfilled, (state, action) => {
                 state.isLoading = false
+                state.message = action.payload.message
+                state.status_code = action.payload.status_code
                 state.workspaces = state.workspaces.filter(
                     (workspace) => workspace._id !== action.meta.arg.workspaceId
                 )
+                toast.success(state.message)
             })
             .addCase(removeWorkspace.rejected, (state, action) => {
                 state.isLoading = false
-                state.message = action.payload
+                state.message = action.payload.message
+                state.status_code = action.payload.status_code
             })
             .addCase(updateWorkspace.pending, (state) => {
                 state.isLoading = true
@@ -146,6 +203,8 @@ const workspaceSlice = createSlice({
             })
             .addCase(updateWorkspace.fulfilled, (state, action) => {
                 state.isLoading = false
+                state.message = action.payload.message
+                state.status_code = action.payload.status_code
                 const index = state.workspaces.findIndex(
                     (workspace) =>
                         workspace._id === action.payload.workspace._id
@@ -153,10 +212,12 @@ const workspaceSlice = createSlice({
                 if (index !== -1) {
                     state.workspaces[index] = action.payload.workspace
                 }
+                toast.success(state.message)
             })
             .addCase(updateWorkspace.rejected, (state, action) => {
                 state.isLoading = false
-                state.message = action.payload
+                state.message = action.payload.message
+                state.status_code = action.payload.status_code
             })
             .addCase(addMemberToWorkspace.pending, (state) => {
                 state.isLoading = true
