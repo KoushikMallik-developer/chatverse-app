@@ -74,6 +74,7 @@ const dmSlice = createSlice({
             })
             .addCase(createDM.fulfilled, (state, action) => {
                 state.isLoading = false
+                debugger
                 if (action.payload.dm) {
                     state.dms.push(action.payload.dm)
                 }
