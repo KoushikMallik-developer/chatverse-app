@@ -7,8 +7,11 @@ const NameToAvatar = ({ name, size = 40 }) => {
         const words = name.trim().split(' ')
         const initials =
             words.length > 1
-                ? words[0][0].toUpperCase() + words[1][0].toUpperCase()
-                : words[0][0].toUpperCase()
+                ? (words[0][0] ? words[0][0].toUpperCase() : '') +
+                  (words[1][0] ? words[1][0].toUpperCase() : '')
+                : words[0][0]
+                  ? words[0][0].toUpperCase()
+                  : ''
         return initials
     }
 
