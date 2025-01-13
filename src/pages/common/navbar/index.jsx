@@ -33,19 +33,19 @@ const Navbar = () => {
 
     return (
         <nav className="bg-[#350d36] text-white p-4 flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-10">
                 <Link to="/">
-                    <h1 className="text-xl font-bold">Chatverse</h1>
+                    <h1 className="text-xl font-extrabold">Chatverse</h1>
                 </Link>
 
                 {pages.map((page) => (
                     <Link key={page.url} to={`/${page.url}`}>
-                        <h1 className="text-xl ">{page.name}</h1>
+                        <h1 className="text-md font-semibold">{page.name}</h1>
                     </Link>
                 ))}
                 {isLoggedIn && (
                     <h1
-                        className="text-xl cursor-pointer"
+                        className="text-md font-semibold cursor-pointer"
                         onClick={handleLogout}
                     >
                         Logout

@@ -6,16 +6,14 @@ import {
     createWorkspace,
     fetchWorkspaces,
     removeWorkspace,
+    setActiveWorkspace,
     updateWorkspace,
 } from '../../store/slices/workspaceSlice'
 import { useNavigate } from 'react-router-dom'
-import { setActiveWorkspace } from '../../store/slices/channelSlice'
 
 const WorkspaceList = () => {
-    const { user, isLoading, isLoggedIn, token } = useSelector(
-        (state) => state.auth
-    )
-    const { workspaces, message } = useSelector((state) => state.workspace)
+    const { token } = useSelector((state) => state.auth)
+    const { workspaces } = useSelector((state) => state.workspace)
     const dispatch = useDispatch()
 
     const [name, setName] = useState('')
@@ -42,7 +40,6 @@ const WorkspaceList = () => {
                     name: editName,
                     description: editDescription,
                 },
-                token,
             })
         )
         setEditWorkspaceId(null)
@@ -53,12 +50,10 @@ const WorkspaceList = () => {
     useEffect(() => {
         dispatch(getUserDetails(token))
         dispatch(fetchWorkspaces(token))
-    }, [token])
+    }, [token, dispatch])
 
     const handleCreateWorkspace = () => {
-        dispatch(
-            createWorkspace({ workspaceData: { name, description }, token })
-        )
+        dispatch(createWorkspace({ workspaceData: { name, description } }))
         setShowForm(false)
         setName('')
         setDescription('')
@@ -148,7 +143,6 @@ const WorkspaceList = () => {
                                                       removeWorkspace({
                                                           workspaceId:
                                                               workspace._id,
-                                                          token: token,
                                                       })
                                                   )
                                               }

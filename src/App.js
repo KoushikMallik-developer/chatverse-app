@@ -1,18 +1,29 @@
 import './App.css'
 import { store } from './store/store'
-import { Provider } from 'react-redux'
+import { Provider, useDispatch } from 'react-redux'
 import Navbar from './pages/common/navbar'
 import Dashboard from './pages/dashboard'
 import Login from './pages/auth/login'
 import Register from './pages/auth/register'
 import WorkspaceList from './pages/workspaces'
 import HomePage from './pages/common/homepage'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { Routes, Route, useLocation } from 'react-router-dom'
 import ProtectedRoute from './components/protected_component'
+import { Toaster } from 'react-hot-toast'
+import { useEffect } from 'react'
+import { resetMessages } from './store/slices/authSlice'
 
 const App = () => {
+    const dispatch = useDispatch()
+    const location = useLocation()
+
+    useEffect(() => {
+        dispatch(resetMessages()) // Reset messages on route change
+    }, [location.pathname, dispatch]) // Trigger when route changes
+
     return (
-        <Router>
+        <>
+            <Toaster position="top-right" reverseOrder={false} />
             <Navbar />
             <Routes>
                 <Route path="/" element={<HomePage />} />
@@ -23,7 +34,7 @@ const App = () => {
                     <Route path="/workspace/:id" element={<Dashboard />} />
                 </Route>
             </Routes>
-        </Router>
+        </>
     )
 }
 
