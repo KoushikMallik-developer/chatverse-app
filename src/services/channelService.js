@@ -3,6 +3,8 @@ import { handleErrorsChannels } from '../utils/error_handler'
 
 const API_URL = 'http://127.0.0.1:8000'
 
+// OLD CODE
+
 const getChannels = async (token, workspaceId) => {
     try {
         const response = await axios.get(

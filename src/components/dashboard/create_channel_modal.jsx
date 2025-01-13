@@ -13,13 +13,10 @@ const CreateChannelModal = ({ isOpen, onClose }) => {
     const handleCreateNewChannel = () => {
         dispatch(
             createChannel({
-                channelData: {
-                    name: channelName,
-                    type: channelType,
-                    description: channelDescription,
-                    workspaceId: currentWorkspace._id,
-                },
-                token: token,
+                name: channelName,
+                type: channelType,
+                description: channelDescription,
+                workspaceId: currentWorkspace._id,
             })
         )
         handleOnClose()
