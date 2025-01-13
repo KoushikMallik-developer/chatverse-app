@@ -6,17 +6,14 @@ import {
     createWorkspace,
     fetchWorkspaces,
     removeWorkspace,
+    setActiveWorkspace,
     updateWorkspace,
 } from '../../store/slices/workspaceSlice'
 import { useNavigate } from 'react-router-dom'
-import { setActiveWorkspace } from '../../store/slices/channelSlice'
-import toast from 'react-hot-toast'
 
 const WorkspaceList = () => {
     const { token } = useSelector((state) => state.auth)
-    const { workspaces, message, status_code } = useSelector(
-        (state) => state.workspace
-    )
+    const { workspaces } = useSelector((state) => state.workspace)
     const dispatch = useDispatch()
 
     const [name, setName] = useState('')

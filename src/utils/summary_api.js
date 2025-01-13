@@ -39,7 +39,7 @@ const SummaryApi = {
     }),
     removeMembersFromWorkspace: (workspaceId) => ({
         url: `/api/workspaces/remove-members/${workspaceId}`,
-        method: 'delete',
+        method: 'post',
     }),
     getChannels: (workspaceId) => ({
         url: `/api/channels/${workspaceId}`,

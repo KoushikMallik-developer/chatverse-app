@@ -10,7 +10,6 @@ export const fetchChannels = createAsyncThunk(
                 token,
                 workspaceId
             )
-            console.log(response, token, workspaceId)
             return response
         } catch (error) {
             return rejectWithValue(error.message)
@@ -70,23 +69,16 @@ const channelSlice = createSlice({
     name: 'channel',
     initialState: {
         currentChannel: {},
-        currentWorkspace: {},
         channels: [],
         isLoading: false,
         message: null,
     },
     reducers: {
-        setActiveWorkspace: (state, action) => {
-            state.currentWorkspace = action.payload
-        },
         setActiveChannel: (state, action) => {
             state.currentChannel = action.payload
         },
         cleanActiveChannel: (state) => {
             state.currentChannel = null
-        },
-        cleanActiveWorkspace: (state) => {
-            state.currentWorkspace = null
         },
     },
     extraReducers: (builder) => {
@@ -151,10 +143,5 @@ const channelSlice = createSlice({
     },
 })
 
-export const {
-    setActiveChannel,
-    setActiveWorkspace,
-    cleanActiveChannel,
-    cleanActiveWorkspace,
-} = channelSlice.actions
+export const { setActiveChannel, cleanActiveChannel } = channelSlice.actions
 export default channelSlice.reducer

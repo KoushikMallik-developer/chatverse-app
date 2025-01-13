@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import workspaceService from '../../services/workspaceService'
 import Axios from '../../utils/axios'
 import SummaryApi from '../../utils/summary_api'
 import { AxiosToastError } from '../../utils/axios_toast_error_handler'
@@ -107,15 +106,26 @@ export const createWorkspace = createAsyncThunk(
 // Async thunk for adding a member to workspace
 export const addMemberToWorkspace = createAsyncThunk(
     'workspace/addMemberToWorkspace',
-    async ({ userData, token }, { rejectWithValue }) => {
+    async ({ userData }, thunkAPI) => {
         try {
-            const response = await workspaceService.addMemberToWorkspace(
-                userData,
-                token
-            )
-            return response
+            const payload = {
+                members: userData['members'],
+            }
+            const response = await Axios({
+                ...SummaryApi.addMembersToWorkspace(userData['workspaceId']),
+                data: payload,
+            })
+            return {
+                workspace: response.data.workspace,
+                message: response.data.message || 'Member added successfully',
+                status_code: response.status,
+            }
         } catch (error) {
-            return rejectWithValue(error.message)
+            const errorPayload = AxiosToastError(error)
+            return thunkAPI.rejectWithValue({
+                message: errorPayload.message,
+                status_code: error.status,
+            })
         }
     }
 )
@@ -123,15 +133,29 @@ export const addMemberToWorkspace = createAsyncThunk(
 // Async thunk for removing a member from workspace
 export const removeMemberFromWorkspace = createAsyncThunk(
     'workspace/removeMemberFromWorkspace',
-    async ({ userData, token }, { rejectWithValue }) => {
+    async ({ userData }, thunkAPI) => {
         try {
-            const response = await workspaceService.removeMemberFromWorkspace(
-                userData,
-                token
-            )
-            return response
+            const payload = {
+                members: userData['members'],
+            }
+            const response = await Axios({
+                ...SummaryApi.removeMembersFromWorkspace(
+                    userData['workspaceId']
+                ),
+                data: payload,
+            })
+            return {
+                workspace: response.data.workspace,
+                message:
+                    response.data.message || 'Member is removed successfully',
+                status_code: response.status,
+            }
         } catch (error) {
-            return rejectWithValue(error.message)
+            const errorPayload = AxiosToastError(error)
+            return thunkAPI.rejectWithValue({
+                message: errorPayload.message,
+                status_code: error.status,
+            })
         }
     }
 )
@@ -140,11 +164,19 @@ const workspaceSlice = createSlice({
     name: 'workspace',
     initialState: {
         workspaces: [],
+        currentWorkspace: {},
         isLoading: false,
         message: null,
         status_code: null,
     },
-    reducers: {},
+    reducers: {
+        setActiveWorkspace: (state, action) => {
+            state.currentWorkspace = action.payload
+        },
+        cleanActiveWorkspace: (state) => {
+            state.currentWorkspace = null
+        },
+    },
     extraReducers: (builder) => {
         builder
             .addCase(fetchWorkspaces.pending, (state) => {
@@ -205,6 +237,7 @@ const workspaceSlice = createSlice({
                 state.isLoading = false
                 state.message = action.payload.message
                 state.status_code = action.payload.status_code
+                state.currentWorkspace = action.payload.workspace
                 const index = state.workspaces.findIndex(
                     (workspace) =>
                         workspace._id === action.payload.workspace._id
@@ -225,6 +258,9 @@ const workspaceSlice = createSlice({
             })
             .addCase(addMemberToWorkspace.fulfilled, (state, action) => {
                 state.isLoading = false
+                state.message = action.payload.message
+                state.status_code = action.payload.status_code
+                state.currentWorkspace = action.payload.workspace
                 const index = state.workspaces.findIndex(
                     (workspace) =>
                         workspace._id === action.payload?.workspace?._id
@@ -232,10 +268,12 @@ const workspaceSlice = createSlice({
                 if (index !== -1) {
                     state.workspaces[index] = action.payload?.workspace
                 }
+                toast.success(state.message)
             })
             .addCase(addMemberToWorkspace.rejected, (state, action) => {
                 state.isLoading = false
-                state.message = action.payload
+                state.message = action.payload.message
+                state.status_code = action.payload.status_code
             })
             .addCase(removeMemberFromWorkspace.pending, (state) => {
                 state.isLoading = true
@@ -243,6 +281,9 @@ const workspaceSlice = createSlice({
             })
             .addCase(removeMemberFromWorkspace.fulfilled, (state, action) => {
                 state.isLoading = false
+                state.message = action.payload.message
+                state.status_code = action.payload.status_code
+                state.currentWorkspace = action.payload.workspace
                 const index = state.workspaces.findIndex(
                     (workspace) =>
                         workspace._id === action.payload.workspace._id
@@ -250,6 +291,7 @@ const workspaceSlice = createSlice({
                 if (index !== -1) {
                     state.workspaces[index] = action.payload.workspace
                 }
+                toast.success(state.message)
             })
             .addCase(removeMemberFromWorkspace.rejected, (state, action) => {
                 state.isLoading = false
@@ -257,4 +299,6 @@ const workspaceSlice = createSlice({
             })
     },
 })
+export const { setActiveWorkspace, cleanActiveWorkspace } =
+    workspaceSlice.actions
 export default workspaceSlice.reducer
