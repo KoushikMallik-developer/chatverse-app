@@ -110,6 +110,61 @@ export const updateChannel = createAsyncThunk(
     }
 )
 
+export const addMemberToChannel = createAsyncThunk(
+    'channel/addMemberToChannel',
+    async (channelData, thunkAPI) => {
+        try {
+            const payload = {
+                userId: channelData['userId'],
+            }
+            const response = await Axios({
+                ...SummaryApi.addMemberToChannel(channelData['channelId']),
+                data: payload,
+            })
+            return {
+                message:
+                    response.data.message ||
+                    'Member added to channel successfully',
+                channel: response.data.channel,
+                status_code: response.status,
+            }
+        } catch (error) {
+            const errorPayload = AxiosToastError(error)
+            return thunkAPI.rejectWithValue({
+                message: errorPayload.message,
+                status_code: error.status,
+            })
+        }
+    }
+)
+export const removeMemberFromChannel = createAsyncThunk(
+    'channel/removeMemberFromChannel',
+    async (channelData, thunkAPI) => {
+        try {
+            const payload = {
+                userId: channelData['userId'],
+            }
+            const response = await Axios({
+                ...SummaryApi.removeMemberFromChannel(channelData['channelId']),
+                data: payload,
+            })
+            return {
+                message:
+                    response.data.message ||
+                    'Member removed from channel successfully',
+                channel: response.data.channel,
+                status_code: response.status,
+            }
+        } catch (error) {
+            const errorPayload = AxiosToastError(error)
+            return thunkAPI.rejectWithValue({
+                message: errorPayload.message,
+                status_code: error.status,
+            })
+        }
+    }
+)
+
 const channelSlice = createSlice({
     name: 'channel',
     initialState: {
@@ -172,6 +227,7 @@ const channelSlice = createSlice({
                 state.channels = state.channels.filter(
                     (channel) => channel._id !== action.meta.arg.channelId
                 )
+                // state.currentChannel = state.channels.length > 0 ? state.channels[0] : null
                 toast.success(state.message)
             })
             .addCase(removeChannel.rejected, (state, action) => {
@@ -192,11 +248,35 @@ const channelSlice = createSlice({
                     (channel) => channel._id === action.payload.channel._id
                 )
                 if (index !== -1) {
-                    state.channels[index] = action.payload
+                    state.channels[index] = action.payload.channel
                 }
+                state.currentChannel = action.payload.channel
                 toast.success(state.message)
             })
             .addCase(updateChannel.rejected, (state, action) => {
+                state.isLoading = false
+                state.message = action.payload
+                state.message = action.payload.message
+                state.status_code = action.payload.status_code
+            })
+            .addCase(addMemberToChannel.pending, (state) => {
+                state.isLoading = true
+                state.message = null
+            })
+            .addCase(addMemberToChannel.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.message = action.payload.message
+                state.status_code = action.payload.status_code
+                const index = state.channels.findIndex(
+                    (channel) => channel._id === action.payload.channel._id
+                )
+                if (index !== -1) {
+                    state.channels[index] = action.payload.channel
+                }
+                state.currentChannel = action.payload.channel
+                toast.success(state.message)
+            })
+            .addCase(addMemberToChannel.rejected, (state, action) => {
                 state.isLoading = false
                 state.message = action.payload
                 state.message = action.payload.message

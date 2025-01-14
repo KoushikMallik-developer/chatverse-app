@@ -78,10 +78,10 @@ const SideBar = () => {
                 <div className="flex items-center justify-between mb-2">
                     <h2 className="font-semibold">Channels</h2>
                     <button
-                        className="bg-white text-[#3f0e40] px-2 py-1 rounded"
-                        onClick={() => setShowAddChannelForm(true)}
+                        className="p-1 hover:bg-gray-100 rounded"
+                        onClick={handleShowAddChannelForm}
                     >
-                        <Plus className="w-4 h-4 cursor-pointer" />
+                        <Plus className="w-4 h-4 text-gray-500" />
                     </button>
                 </div>
                 {channels &&
@@ -116,11 +116,10 @@ const SideBar = () => {
                 <div className="flex items-center justify-between mb-2">
                     <h2 className="font-semibold">Direct Messages</h2>
                     <button
-                        type="button"
-                        className="bg-white text-[#3f0e40] px-2 py-1 rounded"
+                        className="p-1 hover:bg-gray-100 rounded"
                         onClick={() => handleShowCreateDMForm()}
                     >
-                        <Plus className="w-4 h-4 cursor-pointer" />
+                        <Plus className="w-4 h-4 text-gray-500" />
                     </button>
                 </div>
                 {dms &&

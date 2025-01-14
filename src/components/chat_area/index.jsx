@@ -1,15 +1,17 @@
 import React, { useState } from 'react'
 import HuddleControls from '../huddle/HuddleControls'
 import { addReaction, sendMessage } from '../../store/slices/chatSlice'
-import { Reply, Smile, X } from 'lucide-react'
+import { Edit, Reply, Smile, X } from 'lucide-react'
 import EmojiPicker from '../common/emoji_picker'
 import { useDispatch, useSelector } from 'react-redux'
+import ChannelDetailsModal from '../dashboard/channel_detail_modal'
+import NameToAvatar from '../../utils/name_to_avatar'
+import ChatHeader from '../chat_header'
 
 const ChatArea = () => {
     const dispatch = useDispatch()
-    const { messages, channels, users, activeChat } = useSelector(
-        (state) => state.chat
-    )
+    const { messages } = useSelector((state) => state.chat)
+    const { currentChannel } = useSelector((state) => state.channel)
 
     const [messageInput, setMessageInput] = useState('')
     const [showEmojiPicker, setShowEmojiPicker] = useState(false)
@@ -37,33 +39,17 @@ const ChatArea = () => {
 
     return (
         <div className="flex-1 flex flex-col bg-white">
-            {/* Chat Header */}
-            <div className="border-b p-4 flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                    {activeChat.type === 'channel' ? (
-                        <span className="font-semibold">
-                            #{' '}
-                            {channels.find((c) => c.id === activeChat.id)?.name}
-                        </span>
-                    ) : (
-                        <span className="font-semibold">
-                            {users.find((u) => u.id === activeChat.id)?.name}
-                        </span>
-                    )}
-                </div>
-
-                <HuddleControls />
-            </div>
-
+            <ChatHeader />
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4">
                 {messages
                     .filter((msg) => {
-                        if (activeChat.type === 'channel') return !msg.isDirect
+                        if (currentChannel.type === 'channel')
+                            return !msg.isDirect
                         return (
                             msg.isDirect &&
-                            (msg.to === activeChat.id ||
-                                msg.from === activeChat.id)
+                            (msg.to === currentChannel.id ||
+                                msg.from === currentChannel.id)
                         )
                     })
                     .map((message) => (
@@ -76,8 +62,9 @@ const ChatArea = () => {
                                     className="w-8 h-8 bg-[#1164A3] text-white rounded-full flex items-center justify-center cursor-pointer"
                                     onClick={() => {
                                         setSelectedUser(
-                                            users.find(
-                                                (u) => u.name === message.user
+                                            currentChannel.members.find(
+                                                (u) =>
+                                                    u._id === message.user._id
                                             )
                                         )
                                         setShowUserProfile(true)
@@ -222,14 +209,14 @@ const ChatArea = () => {
                         onKeyPress={(e) =>
                             e.key === 'Enter' && handleSendMessage()
                         }
-                        placeholder={`Message ${
-                            activeChat.type === 'channel'
-                                ? '#' +
-                                  channels.find((c) => c.id === activeChat.id)
-                                      ?.name
-                                : users.find((u) => u.id === activeChat.id)
-                                      ?.name
-                        }`}
+                        // placeholder={`Message ${
+                        //     currentChannel.type === 'channel'
+                        //         ? '#' +
+                        //           channels.find((c) => c.id === currentChannel.id)
+                        //               ?.name
+                        //         : users.find((u) => u.id === currentChannel.id)
+                        //               ?.name
+                        // }`}
                         className="flex-1 p-2 border rounded-md focus:outline-none focus:border-[#1164A3]"
                     />
                     <button

@@ -1,18 +1,28 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import dmService from '../../services/dmService'
+import Axios from '../../utils/axios'
+import SummaryApi from '../../utils/summary_api'
+import { AxiosToastError } from '../../utils/axios_toast_error_handler'
+import toast from 'react-hot-toast'
 
 // Async thunk for getting DMs
 export const getDMs = createAsyncThunk(
     'dm/getDMs',
-    async ({ workspaceId, token }, { rejectWithValue }) => {
+    async ({ workspaceId }, thunkAPI) => {
         try {
-            const response = await dmService.getDMChannels({
-                token: token,
-                workspaceId: workspaceId,
+            const response = await Axios({
+                ...SummaryApi.getDMChannels(workspaceId),
             })
-            return response
+            return {
+                message: 'DM Channels fetched successfully',
+                dms: response.data,
+                status_code: response.status,
+            }
         } catch (error) {
-            return rejectWithValue(error.message)
+            const errorPayload = AxiosToastError(error)
+            return thunkAPI.rejectWithValue({
+                message: errorPayload.message,
+                status_code: error.status,
+            })
         }
     }
 )
@@ -20,25 +30,50 @@ export const getDMs = createAsyncThunk(
 // Async thunk for creating a DM
 export const createDM = createAsyncThunk(
     'dm/createDM',
-    async ({ dmData, token }, { rejectWithValue }) => {
+    async ({ dmData }, thunkAPI) => {
         try {
-            debugger
-            const response = await dmService.createDMChannel({ dmData, token })
-            return response
+            const payload = {
+                workspaceId: dmData['workspaceId'],
+                recipientId: dmData['recipientId'],
+            }
+            const response = await Axios({
+                ...SummaryApi.createDMChannel,
+                data: payload,
+            })
+            return {
+                message:
+                    response.data.message || 'DM Channel created successfully',
+                dm: response.data.dm,
+                status_code: response.status,
+            }
         } catch (error) {
-            return rejectWithValue(error.message)
+            const errorPayload = AxiosToastError(error)
+            return thunkAPI.rejectWithValue({
+                message: errorPayload.message,
+                status_code: error.status,
+            })
         }
     }
 )
 // Async thunk for deleting a DM
 export const deleteDM = createAsyncThunk(
     'dm/deleteDM',
-    async ({ dmChannelId, token }, { rejectWithValue }) => {
+    async ({ dmChannelId }, thunkAPI) => {
         try {
-            const response = await dmService.deleteDMChannel(dmChannelId, token)
-            return response
+            const response = await Axios({
+                ...SummaryApi.deleteDMChannel(dmChannelId),
+            })
+            return {
+                message:
+                    response.data.message || 'DM Channel removed successfully',
+                status_code: response.status,
+            }
         } catch (error) {
-            return rejectWithValue(error.message)
+            const errorPayload = AxiosToastError(error)
+            return thunkAPI.rejectWithValue({
+                message: errorPayload.message,
+                status_code: error.status,
+            })
         }
     }
 )
@@ -60,41 +95,55 @@ const dmSlice = createSlice({
         builder
             .addCase(getDMs.pending, (state) => {
                 state.isLoading = true
+                state.message = null
             })
             .addCase(getDMs.fulfilled, (state, action) => {
                 state.isLoading = false
-                state.dms = action.payload
+                state.dms = action.payload.dms
+                state.message = action.payload.message
+                state.status_code = action.payload.status_code
+                toast.success(state.message)
             })
             .addCase(getDMs.rejected, (state, action) => {
                 state.isLoading = false
-                state.message = action.payload
+                state.message = action.payload.message
+                state.status_code = action.payload.status_code
             })
             .addCase(createDM.pending, (state) => {
                 state.isLoading = true
+                state.message = null
             })
             .addCase(createDM.fulfilled, (state, action) => {
                 state.isLoading = false
-                debugger
+                state.message = action.payload.message
+                state.status_code = action.payload.status_code
                 if (action.payload.dm) {
                     state.dms.push(action.payload.dm)
                 }
+                toast.success(state.message)
             })
             .addCase(createDM.rejected, (state, action) => {
                 state.isLoading = false
-                state.message = action.payload
+                state.message = action.payload.message
+                state.status_code = action.payload.status_code
             })
             .addCase(deleteDM.pending, (state) => {
                 state.isLoading = true
+                state.message = null
             })
             .addCase(deleteDM.fulfilled, (state, action) => {
                 state.isLoading = false
                 state.dms = state.dms.filter(
                     (dm) => dm._id !== action.meta.arg.dmChannelId
                 )
+                state.message = action.payload.message
+                state.status_code = action.payload.status_code
+                toast.success(state.message)
             })
             .addCase(deleteDM.rejected, (state, action) => {
                 state.isLoading = false
-                state.message = action.payload
+                state.message = action.payload.message
+                state.status_code = action.payload.status_code
             })
     },
 })

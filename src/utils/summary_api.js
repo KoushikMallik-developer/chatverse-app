@@ -69,6 +69,14 @@ const SummaryApi = {
         url: `/api/DMs/${dmChannelId}`,
         method: 'delete',
     }),
+    addMemberToChannel: (channelId) => ({
+        url: `/api/channels/${channelId}/members`,
+        method: 'post',
+    }),
+    removeMemberFromChannel: (channelId) => ({
+        url: `/api/channels/${channelId}/members`,
+        method: 'delete',
+    }),
 }
 
 export default SummaryApi
