@@ -44,7 +44,7 @@ const SideBar = () => {
     }
 
     const handleShowWorkspaceDetailsModal = () => {
-        setShowWorkspaceDetailsModal(!showAddMemberToWorkspaceForm)
+        setShowWorkspaceDetailsModal(!showWorkspaceDetailsModal)
     }
 
     const handleShowCreateDMForm = () => {
@@ -57,11 +57,11 @@ const SideBar = () => {
                     {currentWorkspace.name}
                 </h1>
                 <div className="flex space-x-2">
-                    <button className="p-1 hover:bg-gray-100 rounded">
-                        <Plus
-                            className="w-4 h-4 text-gray-500"
-                            onClick={handleShowAddMemberToWorkspaceForm}
-                        />
+                    <button
+                        className="p-1 hover:bg-gray-100 rounded"
+                        onClick={handleShowAddMemberToWorkspaceForm}
+                    >
+                        <Plus className="w-4 h-4 text-gray-500" />
                     </button>
                     <button
                         className="p-1 hover:bg-gray-100 rounded"

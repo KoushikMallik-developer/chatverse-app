@@ -107,7 +107,7 @@ const ChannelDetailsModal = ({ isOpen, onClose }) => {
                         {currentChannel.members.map((member) => (
                             <li
                                 key={member._id}
-                                className="flex justify-between items-center"
+                                className="flex justify-between items-center text-black"
                             >
                                 <span>{member.name}</span>
                                 <button

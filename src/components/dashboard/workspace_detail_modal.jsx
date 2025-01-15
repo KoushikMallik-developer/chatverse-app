@@ -13,6 +13,10 @@ const WorkspaceDetailsModal = ({ isOpen, onClose }) => {
     const { currentWorkspace } = useSelector((state) => state.workspace)
     const [selectedMember, setSelectedMember] = useState('')
 
+    const handleOnClose = () => {
+        setSelectedMember('')
+        onClose()
+    }
     const handleRemoveMember = (memberId) => {
         dispatch(
             removeMemberFromWorkspace({
@@ -22,6 +26,7 @@ const WorkspaceDetailsModal = ({ isOpen, onClose }) => {
                 },
             })
         )
+        handleOnClose()
     }
 
     const handleAddMember = () => {
@@ -33,7 +38,7 @@ const WorkspaceDetailsModal = ({ isOpen, onClose }) => {
                 },
             })
         )
-        setSelectedMember('')
+        handleOnClose()
     }
 
     const handleLeaveWorkspace = () => {
@@ -122,7 +127,7 @@ const WorkspaceDetailsModal = ({ isOpen, onClose }) => {
                     </button>
                     <button
                         className="bg-gray-500 text-white px-4 py-2 rounded"
-                        onClick={onClose}
+                        onClick={handleOnClose}
                     >
                         Close
                     </button>
