@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 import { useDispatch, useSelector } from 'react-redux'
 import {
+    clearSocketListeners,
     initializeSocketListeners,
     sendMessage,
 } from '../../store/slices/chatSlice'
@@ -15,8 +16,13 @@ const MessageInput = () => {
     const [replyingTo, setReplyingTo] = useState(null)
 
     useEffect(() => {
+        console.log('initilaizing socket listeners')
         initializeSocketListeners(dispatch)
-    }, [user])
+        return () => {
+            console.log('clearing socket listeners')
+            clearSocketListeners()
+        }
+    }, [])
 
     const handleSendMessage = () => {
         if (!messageInput.trim()) return

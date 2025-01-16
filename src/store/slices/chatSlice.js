@@ -96,9 +96,14 @@ export const initializeSocketListeners = (dispatch) => {
         dispatch(addMessage(data))
     })
     socket.on('userJoined', (data) => {
-        console.log(`User ${data.username} joined the channel`)
+        console.log(`User ${data.user_name} joined the channel`)
     })
     socket.on('userLeft', (data) => {
-        console.log(`User ${data.username} left the channel`)
+        console.log(`User ${data.user_name} left the channel`)
     })
+}
+export const clearSocketListeners = () => {
+    socket.off('newMessage')
+    socket.off('userJoined')
+    socket.off('userLeft')
 }
