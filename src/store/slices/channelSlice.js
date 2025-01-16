@@ -192,6 +192,7 @@ const channelSlice = createSlice({
                 state.channels = action.payload.channels
                 state.message = action.payload.message
                 state.status_code = action.payload.status_code
+                state.currentChannel = null
                 toast.success(state.message)
             })
             .addCase(fetchChannels.rejected, (state, action) => {
@@ -210,6 +211,7 @@ const channelSlice = createSlice({
                 if (action.payload.channel) {
                     state.channels.push(action.payload.channel)
                 }
+                state.currentChannel = action.payload.channel
                 toast.success(state.message)
             })
             .addCase(createChannel.rejected, (state, action) => {
@@ -227,7 +229,7 @@ const channelSlice = createSlice({
                 state.channels = state.channels.filter(
                     (channel) => channel._id !== action.meta.arg.channelId
                 )
-                // state.currentChannel = state.channels.length > 0 ? state.channels[0] : null
+                state.currentChannel = null
                 toast.success(state.message)
             })
             .addCase(removeChannel.rejected, (state, action) => {
