@@ -77,6 +77,10 @@ const SummaryApi = {
         url: `/api/channels/${channelId}/members`,
         method: 'delete',
     }),
+    getMessages: (channelId) => ({
+        url: `/api/messages/${channelId}`,
+        method: 'get',
+    }),
 }
 
 export default SummaryApi

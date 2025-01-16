@@ -7,7 +7,7 @@ import WorkspaceHome from './workspace_home'
 const ChatArea = () => {
     const { currentChannel } = useSelector((state) => state.channel)
     return (
-        <div className="flex-1 flex flex-col bg-white">
+        <div className="flex-1 flex flex-col overflow-y-auto bg-white">
             {currentChannel ? (
                 <>
                     {/*Chat header*/}

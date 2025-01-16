@@ -257,7 +257,6 @@ const channelSlice = createSlice({
             })
             .addCase(updateChannel.rejected, (state, action) => {
                 state.isLoading = false
-                state.message = action.payload
                 state.message = action.payload.message
                 state.status_code = action.payload.status_code
             })

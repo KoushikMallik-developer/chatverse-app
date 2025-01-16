@@ -22,7 +22,7 @@ const Navbar = () => {
     ]
     const pages = isLoggedIn ? logged_in_pages : logged_out_pages
 
-    const { users, notifications } = useSelector((state) => state.chat)
+    const { notifications } = useSelector((state) => state.chat)
 
     const navigate = useNavigate()
 
@@ -72,19 +72,12 @@ const Navbar = () => {
                             dispatch({ type: 'CLEAR_NOTIFICATIONS' })
                         }
                     />
-                    {notifications.length > 0 && (
+                    {notifications?.length > 0 && (
                         <span className="absolute -top-1 -right-1 bg-red-500 rounded-full w-4 h-4 text-xs flex items-center justify-center">
                             {notifications.length}
                         </span>
                     )}
                 </div>
-                <User
-                    className="w-6 h-6 cursor-pointer"
-                    onClick={() => {
-                        setSelectedUser(users.find((u) => u.id === 1)) // Current user
-                        setShowUserProfile(true)
-                    }}
-                />
                 <Settings className="w-6 h-6 cursor-pointer" />
             </div>
         </nav>

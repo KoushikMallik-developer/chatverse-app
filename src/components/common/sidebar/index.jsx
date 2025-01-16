@@ -13,6 +13,7 @@ import CreateChannelModal from '../../dashboard/create_channel_modal'
 import CreateDMModal from '../../dashboard/create_dm_channel_modal'
 import WorkspaceDetailsModal from '../../dashboard/workspace_detail_modal'
 import UserCard from '../user_card'
+import { joinChannel, leaveChannel } from '../../../store/slices/chatSlice'
 
 const SideBar = () => {
     const dispatch = useDispatch()
@@ -53,6 +54,14 @@ const SideBar = () => {
 
     const handleGoToWorkspaceHomePage = () => {
         dispatch(setActiveChannel(null))
+    }
+    const handleOnClickChannel = (channel) => {
+        if (currentChannel) {
+            dispatch(
+                leaveChannel({ channelId: currentChannel._id, user: user })
+            )
+        }
+        dispatch(setActiveChannel(channel))
     }
 
     return (
@@ -106,7 +115,7 @@ const SideBar = () => {
                                                 : 'hover:bg-[#350d36]'
                                         }`}
                                         onClick={() =>
-                                            dispatch(setActiveChannel(channel))
+                                            handleOnClickChannel(channel)
                                         }
                                     >
                                         <span># {channel.name}</span>

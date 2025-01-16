@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Edit } from 'lucide-react'
 import NameToAvatar from '../../utils/name_to_avatar'
-import HuddleControls from '../huddle/HuddleControls'
 import ChannelDetailsModal from '../dashboard/channel_detail_modal'
 import { useSelector } from 'react-redux'
 
@@ -49,8 +48,6 @@ const ChatHeader = () => {
                         </div>
                     )}
                 </div>
-
-                <HuddleControls />
             </div>
             <ChannelDetailsModal
                 isOpen={showChannelDetailsModal}
