@@ -12,7 +12,7 @@ export const Message = ({ message }) => {
             .replace(/_([^_]+)_/g, '<em>$1</em>') // Italic
             .replace(
                 /`([^`]+)`/g,
-                '<code class="bg-gray-100 px-1 rounded">$1</code>'
+                '<code class="bg-gray-100 text-gray-700 px-1 rounded">$1</code>'
             ) // Code
             .replace(/\n/g, '<br />') // Line breaks
             .replace(
