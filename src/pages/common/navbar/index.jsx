@@ -51,17 +51,6 @@ const Navbar = () => {
                         Logout
                     </h1>
                 )}
-
-                <div className="relative">
-                    <Search className="absolute left-2 top-2 w-4 h-4 text-gray-400" />
-                    <input
-                        type="text"
-                        placeholder="Search Chatverse"
-                        className="bg-[#431e44] pl-8 pr-4 py-1 rounded text-sm focus:outline-none"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                </div>
             </div>
 
             <div className="flex items-center gap-4">

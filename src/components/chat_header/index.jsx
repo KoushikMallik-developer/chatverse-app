@@ -1,17 +1,28 @@
 import React, { useState } from 'react'
-import { Edit } from 'lucide-react'
+import { Edit, Search } from 'lucide-react'
 import NameToAvatar from '../../utils/name_to_avatar'
 import ChannelDetailsModal from '../dashboard/channel_detail_modal'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { searchMessages } from '../../store/slices/chatSlice'
 
 const ChatHeader = () => {
     const { currentChannel } = useSelector((state) => state.channel)
     const { user } = useSelector((state) => state.auth)
     const [showChannelDetailsModal, setShowChannelDetailsModal] =
         useState(false)
+    const [searchQuery, setSearchQuery] = useState('')
 
     const handleShowChannelDetails = () => {
         setShowChannelDetailsModal(!showChannelDetailsModal)
+    }
+    const dispatch = useDispatch()
+    const handleSearch = () => {
+        dispatch(
+            searchMessages({
+                channelId: currentChannel._id,
+                query: searchQuery,
+            })
+        )
     }
     return (
         <div>
@@ -47,6 +58,17 @@ const ChatHeader = () => {
                             </span>
                         </div>
                     )}
+                </div>
+                <div className="relative">
+                    <Search className="absolute left-2 top-2 w-4 h-4 text-gray-400" />
+                    <input
+                        type="text"
+                        placeholder="Search messages"
+                        className="bg-[#431e44] pl-8 pr-4 py-1 rounded text-sm focus:outline-none text-white"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                    />
                 </div>
             </div>
             <ChannelDetailsModal

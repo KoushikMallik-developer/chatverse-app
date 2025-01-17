@@ -30,7 +30,7 @@ const ChannelDetailsModal = ({ isOpen, onClose }) => {
         dispatch(
             removeMemberFromChannel({
                 channelId: currentChannel._id,
-                memberId,
+                userEmail: memberId,
             })
         )
     }
@@ -39,7 +39,7 @@ const ChannelDetailsModal = ({ isOpen, onClose }) => {
         dispatch(
             addMemberToChannel({
                 channelId: currentChannel._id,
-                memberId: selectedMember,
+                userEmail: selectedMember,
             })
         )
         setSelectedMember('')
@@ -113,7 +113,7 @@ const ChannelDetailsModal = ({ isOpen, onClose }) => {
                                 <button
                                     className="p-1 hover:bg-gray-100 rounded"
                                     onClick={() =>
-                                        handleRemoveMember(member._id)
+                                        handleRemoveMember(member.email)
                                     }
                                 >
                                     <UserMinus className="w-4 h-4 text-gray-500" />

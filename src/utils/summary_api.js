@@ -81,6 +81,10 @@ const SummaryApi = {
         url: `/api/messages/${channelId}`,
         method: 'get',
     }),
+    searchMessages: {
+        url: `/api/messages/search`,
+        method: 'post',
+    },
 }
 
 export default SummaryApi

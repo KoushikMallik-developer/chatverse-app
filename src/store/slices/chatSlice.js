@@ -55,14 +55,50 @@ export const fetchMessages = createAsyncThunk(
     }
 )
 
+export const searchMessages = createAsyncThunk(
+    'channel/searchMessages',
+    async ({ channelId, query }, thunkAPI) => {
+        try {
+            const payload = {
+                channelId: channelId,
+                query: query,
+            }
+            const response = await Axios({
+                ...SummaryApi.searchMessages,
+                data: payload,
+            })
+            return {
+                message:
+                    response.data.message ||
+                    'Search result fetched successfully',
+                messages: response.data.messages,
+                status_code: response.status,
+            }
+        } catch (error) {
+            const errorPayload = AxiosToastError(error)
+            return thunkAPI.rejectWithValue({
+                message: errorPayload.message,
+                status_code: error.status,
+            })
+        }
+    }
+)
+
 const chatSlice = createSlice({
     name: 'chat',
     initialState: {
         currentChannelMessages: [],
+        searchMessagesResult: [],
+        isLoading: false,
+        message: null,
+        status_code: null,
     },
     reducers: {
         addMessage: (state, action) => {
             state.currentChannelMessages.push(action.payload)
+        },
+        resetSearchResult: (state) => {
+            state.searchMessagesResult = []
         },
     },
     extraReducers: (builder) => {
@@ -83,10 +119,26 @@ const chatSlice = createSlice({
                 state.message = action.payload.message
                 state.status_code = action.payload.status_code
             })
+            .addCase(searchMessages.pending, (state) => {
+                state.isLoading = true
+                state.message = null
+            })
+            .addCase(searchMessages.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.message = action.payload.message
+                state.searchMessagesResult = action.payload.messages
+                state.status_code = action.payload.status_code
+                toast.success(state.message)
+            })
+            .addCase(searchMessages.rejected, (state, action) => {
+                state.isLoading = false
+                state.message = action.payload.message
+                state.status_code = action.payload.status_code
+            })
     },
 })
 
-export const { addMessage } = chatSlice.actions
+export const { addMessage, resetSearchResult } = chatSlice.actions
 
 export default chatSlice.reducer
 

@@ -115,7 +115,7 @@ export const addMemberToChannel = createAsyncThunk(
     async (channelData, thunkAPI) => {
         try {
             const payload = {
-                userId: channelData['userId'],
+                userEmail: channelData['userEmail'],
             }
             const response = await Axios({
                 ...SummaryApi.addMemberToChannel(channelData['channelId']),
@@ -142,7 +142,7 @@ export const removeMemberFromChannel = createAsyncThunk(
     async (channelData, thunkAPI) => {
         try {
             const payload = {
-                userId: channelData['userId'],
+                userEmail: channelData['userEmail'],
             }
             const response = await Axios({
                 ...SummaryApi.removeMemberFromChannel(channelData['channelId']),
