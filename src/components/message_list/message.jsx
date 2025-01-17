@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { format_timestamp } from '../../utils/format_timestamp'
 import NameToAvatar from '../../utils/name_to_avatar'
+import { useSelector } from 'react-redux'
 
 export const Message = ({ message }) => {
     const [showActions, setShowActions] = useState(false)
+    const { user } = useSelector((state) => state.auth)
 
     const formatContent = (content) => {
         // Replace markdown-style formatting with HTML
@@ -25,7 +27,7 @@ export const Message = ({ message }) => {
 
     return (
         <div
-            className="group flex gap-3 px-4 py-2 hover:bg-gray-900 bg-[#3f0e40] rounded-md items-center m-4 text-white"
+            className={`group flex gap-3 px-4 py-2 hover:bg-gray-900 bg-[#3f0e40] rounded-md items-center m-4 text-white ${message.sender._id === user._id ? 'bg-gray-500' : 'bg-[#3f0e40'}`}
             onMouseEnter={() => setShowActions(true)}
             onMouseLeave={() => setShowActions(false)}
         >

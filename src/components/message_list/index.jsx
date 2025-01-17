@@ -1,9 +1,7 @@
 import React, { useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
-    clearSocketListeners,
     fetchMessages,
-    initializeSocketListeners,
     joinChannel,
     resetSearchResult,
 } from '../../store/slices/chatSlice'
@@ -24,15 +22,6 @@ const MessageList = () => {
             dispatch(fetchMessages({ channelId: currentChannel._id }))
         }
     }, [currentChannel._id])
-
-    useEffect(() => {
-        console.log('initilaizing socket listeners')
-        initializeSocketListeners(dispatch)
-        return () => {
-            console.log('clearing socket listeners')
-            clearSocketListeners()
-        }
-    }, [])
 
     useEffect(() => {
         if (messageListRef.current) {

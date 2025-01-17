@@ -89,6 +89,7 @@ const chatSlice = createSlice({
     initialState: {
         currentChannelMessages: [],
         searchMessagesResult: [],
+        onlineUsers: [],
         isLoading: false,
         message: null,
         status_code: null,
@@ -99,6 +100,12 @@ const chatSlice = createSlice({
         },
         resetSearchResult: (state) => {
             state.searchMessagesResult = []
+        },
+        setOnlineUsers: (state, action) => {
+            state.onlineUsers = action.payload
+        },
+        setUserOnline: (state, action) => {
+            socket.emit('user_online', action.payload)
         },
     },
     extraReducers: (builder) => {
@@ -138,7 +145,8 @@ const chatSlice = createSlice({
     },
 })
 
-export const { addMessage, resetSearchResult } = chatSlice.actions
+export const { addMessage, resetSearchResult, setOnlineUsers, setUserOnline } =
+    chatSlice.actions
 
 export default chatSlice.reducer
 
@@ -152,6 +160,9 @@ export const initializeSocketListeners = (dispatch) => {
     })
     socket.on('userLeft', (data) => {
         console.log(`User ${data.user_name} left the channel`)
+    })
+    socket.on('online_users', (users) => {
+        dispatch(setOnlineUsers(users))
     })
 }
 export const clearSocketListeners = () => {

@@ -21,6 +21,7 @@ const SideBar = () => {
     const { dms } = useSelector((state) => state.dm)
     const { currentWorkspace } = useSelector((state) => state.workspace)
     const { token, user } = useSelector((state) => state.auth)
+    const { onlineUsers } = useSelector((state) => state.chat)
 
     useEffect(() => {
         dispatch(
@@ -159,7 +160,12 @@ const SideBar = () => {
                                     >
                                         <div
                                             className={`w-2 h-2 rounded-full ${
-                                                channel.status === 'online'
+                                                onlineUsers.includes(
+                                                    channel.members[0]._id ===
+                                                        user._id
+                                                        ? channel.members[1]._id
+                                                        : channel.members[0]._id
+                                                )
                                                     ? 'bg-green-500'
                                                     : 'bg-gray-500'
                                             }`}
