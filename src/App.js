@@ -12,6 +12,8 @@ import ProtectedRoute from './components/protected_component'
 import { Toaster } from 'react-hot-toast'
 import { useEffect } from 'react'
 import { resetMessages } from './store/slices/authSlice'
+import { resetSearchResult } from './store/slices/chatSlice'
+import { cleanActiveChannel } from './store/slices/channelSlice'
 
 const App = () => {
     const dispatch = useDispatch()
@@ -19,6 +21,8 @@ const App = () => {
 
     useEffect(() => {
         dispatch(resetMessages()) // Reset messages on route change
+        dispatch(resetSearchResult())
+        dispatch(cleanActiveChannel())
     }, [location.pathname, dispatch]) // Trigger when route changes
 
     return (

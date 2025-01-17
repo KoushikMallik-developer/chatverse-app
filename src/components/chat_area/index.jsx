@@ -1,5 +1,5 @@
 import ChatHeader from '../chat_header'
-import Message from '../message'
+import MessageList from '../message_list'
 import MessageInput from './message_input'
 import { useSelector } from 'react-redux'
 import WorkspaceHome from './workspace_home'
@@ -13,7 +13,7 @@ const ChatArea = () => {
                     {/*Chat header*/}
                     <ChatHeader />
                     {/* Messages */}
-                    <Message />
+                    <MessageList />
 
                     {/* Message Input */}
                     <MessageInput />
