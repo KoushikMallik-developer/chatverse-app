@@ -10,9 +10,10 @@ import {
     updateWorkspace,
 } from '../../store/slices/workspaceSlice'
 import { useNavigate } from 'react-router-dom'
+import { setUserOnline } from '../../store/slices/chatSlice'
 
 const WorkspaceList = () => {
-    const { token } = useSelector((state) => state.auth)
+    const { token, user } = useSelector((state) => state.auth)
     const { workspaces } = useSelector((state) => state.workspace)
     const dispatch = useDispatch()
 

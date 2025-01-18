@@ -1,4 +1,4 @@
-export const baseURL = 'http://localhost:8000/'
+export const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:8000/'
 
 const SummaryApi = {
     register: {
@@ -69,6 +69,22 @@ const SummaryApi = {
         url: `/api/DMs/${dmChannelId}`,
         method: 'delete',
     }),
+    addMemberToChannel: (channelId) => ({
+        url: `/api/channels/${channelId}/members`,
+        method: 'post',
+    }),
+    removeMemberFromChannel: (channelId) => ({
+        url: `/api/channels/${channelId}/members`,
+        method: 'delete',
+    }),
+    getMessages: (channelId) => ({
+        url: `/api/messages/${channelId}`,
+        method: 'get',
+    }),
+    searchMessages: {
+        url: `/api/messages/search`,
+        method: 'post',
+    },
 }
 
 export default SummaryApi

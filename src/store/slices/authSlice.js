@@ -18,7 +18,6 @@ export const registerUser = createAsyncThunk(
                 ...SummaryApi.register,
                 data: payload,
             })
-            debugger
             return {
                 message: response.data.message,
                 status_code: response.status,
@@ -152,7 +151,6 @@ const authSlice = createSlice({
                 state.message = null
             })
             .addCase(registerUser.fulfilled, (state, action) => {
-                debugger
                 state.isLoading = false
                 state.message = action.payload.message
                 state.status_code = action.payload.status_code

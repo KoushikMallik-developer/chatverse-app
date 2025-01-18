@@ -19,7 +19,7 @@ const NameToAvatar = ({ name, size = 40 }) => {
 
     return (
         <div
-            className="flex items-center justify-center bg-white text-gray-800 font-bold rounded-full"
+            className="flex items-center justify-center bg-gray-800 text-white font-bold rounded-full"
             style={{
                 width: `${size}px`,
                 height: `${size}px`,
