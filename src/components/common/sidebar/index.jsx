@@ -13,7 +13,12 @@ import CreateChannelModal from '../../dashboard/create_channel_modal'
 import CreateDMModal from '../../dashboard/create_dm_channel_modal'
 import WorkspaceDetailsModal from '../../dashboard/workspace_detail_modal'
 import UserCard from '../user_card'
-import { joinChannel, leaveChannel } from '../../../store/slices/chatSlice'
+import {
+    joinChannel,
+    leaveChannel,
+    resetNotifications,
+} from '../../../store/slices/chatSlice'
+import { debug } from 'prettier/doc'
 
 const SideBar = () => {
     const dispatch = useDispatch()
@@ -21,7 +26,7 @@ const SideBar = () => {
     const { dms } = useSelector((state) => state.dm)
     const { currentWorkspace } = useSelector((state) => state.workspace)
     const { token, user } = useSelector((state) => state.auth)
-    const { onlineUsers } = useSelector((state) => state.chat)
+    const { onlineUsers, notifications } = useSelector((state) => state.chat)
 
     useEffect(() => {
         dispatch(
@@ -30,7 +35,12 @@ const SideBar = () => {
         dispatch(getDMs({ token: token, workspaceId: currentWorkspace._id }))
     }, [currentWorkspace, token])
 
-    const [showUserProfile, setShowUserProfile] = useState(false)
+    useEffect(() => {
+        for (const channel of channels) {
+            dispatch(joinChannel({ user: user, channelId: channel?._id }))
+        }
+    })
+
     const [showAddChannelForm, setShowAddChannelForm] = useState(false)
     const [showAddMemberToWorkspaceForm, setShowAddMemberToWorkspaceForm] =
         useState(false)
@@ -57,11 +67,7 @@ const SideBar = () => {
         dispatch(setActiveChannel(null))
     }
     const handleOnClickChannel = (channel) => {
-        if (currentChannel) {
-            dispatch(
-                leaveChannel({ channelId: currentChannel._id, user: user })
-            )
-        }
+        dispatch(resetNotifications({ channelId: channel._id }))
         dispatch(setActiveChannel(channel))
     }
 
@@ -114,7 +120,7 @@ const SideBar = () => {
                                             currentChannel?._id === channel._id
                                                 ? 'bg-[#1164A3]'
                                                 : 'hover:bg-[#350d36]'
-                                        }`}
+                                        } ${channel._id !== currentChannel?._id ? (notifications[channel._id] > 0 ? 'bg-red-500' : '') : dispatch(resetNotifications({ channelId: currentChannel._id }))}`}
                                         onClick={() =>
                                             handleOnClickChannel(channel)
                                         }
@@ -143,8 +149,9 @@ const SideBar = () => {
                     </div>
                     {dms &&
                         dms instanceof Array &&
-                        dms.map(
-                            (channel) =>
+                        dms.map((channel) => {
+                            console.log(channel._id, notifications[channel._id])
+                            return (
                                 channel.type === 'dm' && (
                                     <div
                                         key={channel._id}
@@ -152,10 +159,9 @@ const SideBar = () => {
                                             currentChannel?._id === channel._id
                                                 ? 'bg-[#1164A3]'
                                                 : 'hover:bg-[#350d36]'
-                                        }`}
+                                        } ${channel._id !== currentChannel?._id ? (notifications[channel._id] > 0 ? 'bg-red-500' : '') : dispatch(resetNotifications({ channelId: currentChannel._id }))}`}
                                         onClick={() => {
-                                            dispatch(setActiveChannel(channel))
-                                            setShowUserProfile(true)
+                                            handleOnClickChannel(channel)
                                         }}
                                     >
                                         <div
@@ -186,7 +192,8 @@ const SideBar = () => {
                                         </span>
                                     </div>
                                 )
-                        )}
+                            )
+                        })}
                 </div>
             </div>
             <UserCard />

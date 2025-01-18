@@ -7,7 +7,6 @@ import { logout } from '../../../store/slices/authSlice'
 const Navbar = () => {
     const [searchQuery, setSearchQuery] = useState('')
     const dispatch = useDispatch()
-    const [showUserProfile, setShowUserProfile] = useState(false)
     const [selectedUser, setSelectedUser] = useState(null)
 
     const { isLoggedIn } = useSelector((state) => state.auth)

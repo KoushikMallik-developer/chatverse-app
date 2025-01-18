@@ -93,10 +93,16 @@ const chatSlice = createSlice({
         isLoading: false,
         message: null,
         status_code: null,
+        notifications: {},
     },
     reducers: {
         addMessage: (state, action) => {
-            state.currentChannelMessages.push(action.payload)
+            if (
+                action.payload.channel ===
+                state.currentChannelMessages[0]?.channel
+            ) {
+                state.currentChannelMessages.push(action.payload)
+            }
         },
         resetSearchResult: (state) => {
             state.searchMessagesResult = []
@@ -106,6 +112,18 @@ const chatSlice = createSlice({
         },
         setUserOnline: (state, action) => {
             socket.emit('user_online', action.payload)
+        },
+        addNotification: (state, action) => {
+            if (state.notifications[action.payload.channelId]) {
+                state.notifications[action.payload.channelId] += 1
+            } else {
+                state.notifications[action.payload.channelId] = 1
+            }
+        },
+        resetNotifications: (state, action) => {
+            if (state.notifications[action.payload.channelId]) {
+                state.notifications[action.payload.channelId] = 0
+            }
         },
     },
     extraReducers: (builder) => {
@@ -145,8 +163,14 @@ const chatSlice = createSlice({
     },
 })
 
-export const { addMessage, resetSearchResult, setOnlineUsers, setUserOnline } =
-    chatSlice.actions
+export const {
+    addMessage,
+    resetSearchResult,
+    setOnlineUsers,
+    setUserOnline,
+    addNotification,
+    resetNotifications,
+} = chatSlice.actions
 
 export default chatSlice.reducer
 
@@ -163,6 +187,10 @@ export const initializeSocketListeners = (dispatch) => {
     })
     socket.on('online_users', (users) => {
         dispatch(setOnlineUsers(users))
+    })
+    socket.on('notification', (notification) => {
+        console.log(notification)
+        dispatch(addNotification(notification))
     })
 }
 export const clearSocketListeners = () => {
