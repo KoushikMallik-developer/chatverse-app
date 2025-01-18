@@ -40,7 +40,6 @@ const ChatverseApp = () => {
     const [searchQuery, setSearchQuery] = useState('')
     const [showEmojiPicker, setShowEmojiPicker] = useState(false)
     const [replyingTo, setReplyingTo] = useState(null)
-    const [showUserProfile, setShowUserProfile] = useState(false)
     const [selectedUser, setSelectedUser] = useState(null)
 
     // Handle new messages
