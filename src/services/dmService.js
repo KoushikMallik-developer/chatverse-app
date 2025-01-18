@@ -3,6 +3,8 @@ import { handleErrors } from '../utils/error_handler'
 
 const API_URL = 'http://127.0.0.1:8000'
 
+// OLD CODE
+
 const createDMChannel = async ({ dmData, token }) => {
     try {
         const response = await axios.post(`${API_URL}/api/DMs`, dmData, {

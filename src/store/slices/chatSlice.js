@@ -5,7 +5,7 @@ import SummaryApi from '../../utils/summary_api'
 import { AxiosToastError } from '../../utils/axios_toast_error_handler'
 import toast from 'react-hot-toast'
 
-const socket = io('http://localhost:8000')
+const socket = io(process.env.REACT_APP_SOCKET_URL || 'http://localhost:8000')
 
 // Async thunk for joining a room
 export const joinChannel = createAsyncThunk(
